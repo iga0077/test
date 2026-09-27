@@ -46,6 +46,13 @@
                 radial-gradient(ellipse 60% 40% at 100% 100%, rgba(62, 207, 142, 0.08), transparent);
         }
 
+        .cloud-toolbar { display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 16px; color:var(--text-muted); font-size:0.85rem; }
+        .cloud-status { max-width:680px; text-align:center; }
+        .cloud-status.error { color:var(--danger); }
+        .cloud-auth-button { padding:8px 14px; }
+        .cloud-import { display:none; margin:auto; }
+        .data-transfer { justify-content: flex-end; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+        .data-transfer .button { padding: 7px 11px; font-size: 0.78rem; }
         .app-header {
             padding: 28px 20px 8px;
             text-align: center;
@@ -1046,10 +1053,15 @@
 <body>
     <header class="app-header">
         <h1>Тесты на лучшие игры / аниме</h1>
-        <p class="subtitle">Попарные тесты и тир-листы — всё хранится в браузере</p>
+        <p class="subtitle">Попарные тесты и тир-листы — данные сохраняются в Firebase</p>
     </header>
 
-    <div id="mainContainer" class="container">
+    <div class="cloud-toolbar" id="cloudToolbar">
+        <span id="cloudStatus" class="cloud-status" role="status" aria-live="polite">Подключение к Firebase…</span>
+        <button type="button" id="cloudAuthButton" class="button primary cloud-auth-button" style="display:none" onclick="toggleCloudLogin()">Войти через Google</button>
+    </div>
+
+    <div id="mainContainer" class="container" style="display:none">
         <!-- Главное меню -->
         <div id="mainMenu" class="screen active">
             <div class="panel">
@@ -1071,6 +1083,11 @@
                         <div class="menu-card-title">Результаты</div>
                         <div class="menu-card-desc">Таблица мест, очки и добавление новых вариантов</div>
                     </button>
+                </div>
+                <div class="btn-row data-transfer">
+                    <button type="button" class="button ghost" onclick="exportAllData()">Экспорт</button>
+                    <button type="button" class="button ghost" onclick="triggerAllDataImport()">Импорт</button>
+                    <input type="file" id="allDataImportFile" accept=".json,application/json" hidden>
                 </div>
             </div>
         </div>
@@ -1231,8 +1248,116 @@
     </div>
 
     <script>
-        // Глобальные переменные
-        let tests = JSON.parse(localStorage.getItem('tests') || '[]');
+        // Данные работают из оперативной памяти, источник истины — Firestore.
+        let tests = [];
+        let cloudResults = {};
+        let cloudProgress = {};
+        let cloudUid = null;
+        let cloudEpoch = 0;
+        let cloudPending = Promise.resolve();
+        let cloudWriteCount = 0;
+        let cloudReady = false;
+
+        function cloudMessage(message, isError = false) {
+            const el = document.getElementById('cloudStatus');
+            el.textContent = message;
+            el.classList.toggle('error', isError);
+        }
+
+        function cloudStartupError(message) {
+            cloudReady = false;
+            document.getElementById('mainContainer').style.display = 'none';
+            cloudMessage('Firebase: ' + message, true);
+        }
+
+        async function applyCloudAuthState(user) {
+            const epoch = ++cloudEpoch;
+            cloudReady = false;
+            cloudUid = user?.uid || null;
+            tests = [];
+            cloudResults = {};
+            cloudProgress = {};
+            document.getElementById('mainContainer').style.display = 'none';
+            const button = document.getElementById('cloudAuthButton');
+            button.style.display = 'inline-flex';
+            button.textContent = user ? 'Выйти из аккаунта' : 'Войти через Google';
+            if (!user) {
+                cloudMessage('Войди через Google, чтобы увидеть свои тесты и результаты.');
+                return;
+            }
+            cloudMessage('Загружаем данные из Firestore…');
+            try {
+                const data = await window.cloud.load(user.uid);
+                if (epoch !== cloudEpoch || cloudUid !== user.uid) return;
+                tests = data.tests;
+                lastTestsSnapshot = Object.fromEntries(tests.map(test => [test.id, structuredClone(test)]));
+                cloudResults = data.results;
+                cloudProgress = data.progress;
+                cloudReady = true;
+                document.getElementById('mainContainer').style.display = '';
+                cloudMessage('Аккаунт: ' + (user.email || user.displayName || 'Google') + ' · данные из Firestore');
+                showMainMenu();
+            } catch (error) {
+                if (epoch === cloudEpoch) cloudStartupError(error.message || 'Не удалось загрузить данные.');
+            }
+        }
+
+        async function toggleCloudLogin() {
+            if (!window.cloud) return cloudStartupError('Укажи настройки проекта в firebase-config.js.');
+            try {
+                if (cloudUid) {
+                    if (cloudWriteCount) {
+                        cloudMessage('Дожидаемся сохранения изменений перед выходом…');
+                        await cloudPending;
+                    }
+                    await window.cloud.signOut();
+                } else {
+                    await window.cloud.signIn();
+                }
+            } catch (error) {
+                if (error.code !== 'auth/popup-closed-by-user') cloudMessage(error.message || 'Ошибка входа.', true);
+            }
+        }
+
+        function cloudWrite(operation) {
+            const uid = cloudUid;
+            if (!cloudReady || !uid) {
+                cloudMessage('Данные не загружены — сохранение недоступно.', true);
+                return Promise.reject(new Error('Нет активной облачной сессии'));
+            }
+            cloudWriteCount++;
+            cloudMessage('Сохраняем изменения в Firestore…');
+            const next = cloudPending.catch(() => {}).then(async () => {
+                if (uid !== cloudUid) throw new Error('Аккаунт изменился, запись отменена');
+                await operation(uid);
+            });
+            cloudPending = next;
+            next.then(() => {
+                cloudWriteCount--;
+                if (uid === cloudUid && cloudWriteCount === 0) cloudMessage('Все изменения сохранены в Firestore.');
+            }).catch(error => {
+                cloudWriteCount--;
+                if (uid === cloudUid) cloudMessage('Ошибка сохранения: ' + error.message + '. Не закрывай страницу; повтори действие.', true);
+                console.error('Firestore write failed', error);
+            });
+            return next;
+        }
+
+        function persistCollection(kind, previous, current) {
+            const oldIds = new Set(Object.keys(previous));
+            const updates = Object.entries(current).filter(([id, value]) =>
+                JSON.stringify(previous[id]) !== JSON.stringify(value));
+            const removals = [...oldIds].filter(id => !(id in current));
+            if (!updates.length && !removals.length) return Promise.resolve();
+            return cloudWrite(async uid => {
+                for (const [id, value] of updates) {
+                    await window.cloud.put(uid, kind, id, structuredClone(value));
+                }
+                for (const id of removals) await window.cloud.remove(uid, kind, id);
+            });
+        }
+
+         // Глобальные переменные
         let currentTest = null;
         let currentComparisons = [];
         let currentComparisonIndex = 0;
@@ -1252,11 +1377,13 @@
         const DEFAULT_TIER_LABELS = ['S', 'A', 'B', 'C', 'D'];
 
         function getResultsStore() {
-            return JSON.parse(localStorage.getItem('testResults') || '{}');
+            return structuredClone(cloudResults);
         }
 
         function setResultsStore(store) {
-            localStorage.setItem('testResults', JSON.stringify(store));
+            const before = cloudResults;
+            cloudResults = structuredClone(store);
+            persistCollection('results', before, cloudResults).catch(() => {});
         }
 
         function normalizeResultSlot(entry) {
@@ -1347,11 +1474,13 @@
         }
 
         function getProgressStore() {
-            return JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY) || '{}');
+            return structuredClone(cloudProgress);
         }
 
         function setProgressStore(store) {
-            localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(store));
+            const before = cloudProgress;
+            cloudProgress = structuredClone(store);
+            persistCollection('progress', before, cloudProgress).catch(() => {});
         }
 
         function getTestProgress(testId) {
@@ -1490,17 +1619,12 @@
             return [getVariantById(pair[0]), getVariantById(pair[1])];
         }
 
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
-            migrateAllResults();
-        });
+        // Авторизация сама загружает данные; до неё приложение закрыто.
 
-        window.addEventListener('beforeunload', function() {
-            if (document.getElementById('takeTest').classList.contains('active')) {
-                saveCompareProgress();
-            }
-            if (document.getElementById('takeTierList').classList.contains('active')) {
-                saveTierListProgress();
+        window.addEventListener('beforeunload', function(event) {
+            if (cloudWriteCount) {
+                event.preventDefault();
+                event.returnValue = '';
             }
         });
 
@@ -1632,49 +1756,18 @@
             const hint = document.createElement('p');
             hint.className = 'field-hint';
             hint.style.marginTop = '8px';
-            hint.textContent = 'Сохраните файл (ПКМ → «Сохранить как…») и в тесте нажмите «Загрузить файл».';
+            hint.textContent = 'Используй прямую ссылку на картинку, которую разрешено отображать на стороннем сайте.';
             box.appendChild(hint);
 
             img.insertAdjacentElement('afterend', box);
         }
 
         function variantImageFieldHtml() {
-            return `
-                <div class="input-group variant-image-field">
-                    <div class="variant-image-control">
-                        <button type="button" class="button secondary icon-button" onclick="triggerVariantImageFile(this)" aria-label="Загрузить изображение" title="Загрузить файл">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
-                        </button>
-                        <input type="text" class="variant-image-url" placeholder="Изображение" required>
-                    </div>
-                    <input type="file" accept="image/*" class="variant-image-file" hidden>
-                </div>`;
+            return '<div class="input-group variant-image-field"><input type="text" class="variant-image-url" placeholder="Ссылка на изображение (https://…)"></div>';
         }
 
-        function triggerVariantImageFile(btn) {
-            const field = btn.closest('.variant-image-field');
-            if (field) field.querySelector('.variant-image-file').click();
-        }
-
-        function setupVariantImageField(container) {
-            const fileInput = container.querySelector('.variant-image-file');
-            if (!fileInput || fileInput.dataset.bound) return;
-            fileInput.dataset.bound = '1';
-            fileInput.addEventListener('change', function() {
-                const file = fileInput.files[0];
-                if (!file) return;
-                const maxBytes = 1.5 * 1024 * 1024;
-                if (file.size > maxBytes) {
-                    alert('Файл слишком большой (макс. ~1.5 МБ для хранения в браузере).');
-                    fileInput.value = '';
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function() {
-                    container.querySelector('.variant-image-url').value = reader.result;
-                };
-                reader.readAsDataURL(file);
-            });
+        function setupVariantImageField() {
+            // Внешние ссылки: загрузка файлов и Firebase Storage не используются.
         }
 
         function isVariantLink(value) {
@@ -2055,7 +2148,7 @@
             });
 
             clearTierListProgress(currentTestId);
-            alert('Тир-лист сохранён!');
+            alert('Тир-лист завершён. Сохранение в Firestore запущено.');
             showResultsList();
         }
 
@@ -2239,7 +2332,7 @@
 
             tests.push(test);
             saveTests();
-            alert('Тест создан успешно!');
+            alert('Тест создан. Сохранение в Firestore запущено.');
             showMainMenu();
         }
 
@@ -2494,7 +2587,7 @@
             });
 
             clearCompareProgress(currentTestId);
-            alert('Тест завершен! Результаты сохранены.');
+            alert('Тест завершён. Сохранение результатов в Firestore запущено.');
             showResultsList();
         }
 
@@ -2861,7 +2954,7 @@
             tests[testIndex].variants = variants;
             
             saveTests();
-            alert('Тест обновлен успешно!');
+            alert('Тест обновлён. Сохранение в Firestore запущено.');
             showTestsList();
         }
 
@@ -2887,14 +2980,115 @@
 
                 clearAllProgress(testId);
 
-                alert('Тест удален успешно!');
+                alert('Удаление теста из Firestore запущено.');
                 loadTestsList();
             }, 'Удалить', 'danger');
         }
 
         // Утилиты
+        // Совместимо с JSON из локальной версии (format/version/tests/results/progress).
+        async function exportAllData() {
+            if (!cloudReady) return alert('Сначала войди через Google.');
+            try {
+                await cloudPending;
+                if (cloudWriteCount) throw new Error('Сохранение ещё выполняется.');
+                const backup = {
+                    format: 'pairwise-tests-backup',
+                    version: 1,
+                    exportedAt: new Date().toISOString(),
+                    tests: structuredClone(tests),
+                    results: getResultsStore(),
+                    progress: getProgressStore()
+                };
+                const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'tests-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                alert('Резервная копия подготовлена.');
+            } catch (error) {
+                alert('Не удалось экспортировать подтверждённые данные: ' + error.message);
+            }
+        }
+
+        function triggerAllDataImport() {
+            if (!cloudReady) return alert('Сначала войди через Google.');
+            document.getElementById('allDataImportFile').click();
+        }
+
+        function importAllDataFile(file) {
+            if (!file || !cloudReady) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                let backup;
+                try {
+                    backup = JSON.parse(String(reader.result || ''));
+                    if (!backup || backup.format !== 'pairwise-tests-backup' || backup.version !== 1 ||
+                        !Array.isArray(backup.tests) ||
+                        ![backup.results, backup.progress].every(x => x == null ||
+                            (typeof x === 'object' && !Array.isArray(x)))) {
+                        throw new Error('Неверный формат резервной копии.');
+                    }
+                    const ids = backup.tests.map(t => t?.id);
+                    const validId = id => typeof id === 'string' && !!id && !id.includes('/') && !/^__.*__$/.test(id);
+                    if (ids.some(id => !validId(id)) || new Set(ids).size !== ids.length ||
+                        backup.tests.some(t => !t || typeof t.name !== 'string' || !Array.isArray(t.variants)) ||
+                        Object.keys(backup.results || {}).some(id => !validId(id)) ||
+                        Object.keys(backup.progress || {}).some(id => !validId(id))) {
+                        throw new Error('Некорректные идентификаторы или структура тестов.');
+                    }
+                } catch (error) {
+                    return alert('Импорт отменён: ' + error.message);
+                }
+                showConfirmation(
+                    'Заменить ВСЕ тесты, результаты и черновики текущего Google-аккаунта содержимым файла (' +
+                    backup.tests.length + ' тестов)? Перед заменой рекомендуется экспортировать текущие данные.',
+                    () => applyImportedData(backup),
+                    'Заменить данные', 'danger'
+                );
+            };
+            reader.onerror = () => alert('Не удалось прочитать JSON-файл.');
+            reader.readAsText(file);
+        }
+
+        async function applyImportedData(backup) {
+            if (!cloudReady) return;
+            const button = document.getElementById('allDataImportFile');
+            button.disabled = true;
+            try {
+                await cloudPending;
+                const current = {
+                    tests: Object.fromEntries(tests.map(t => [t.id, t])),
+                    results: getResultsStore(),
+                    progress: getProgressStore()
+                };
+                await cloudWrite(uid => window.cloud.replaceBackup(uid, current, backup));
+                // Re-read actual Firestore state; the original JSON file remains untouched.
+                await applyCloudAuthState({ uid: cloudUid, email: 'Google' });
+                alert('Импорт завершён: тестов — ' + backup.tests.length + '.');
+            } catch (error) {
+                cloudMessage('Импорт не выполнен: ' + error.message, true);
+                alert('Импорт не выполнен: ' + error.message);
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        document.getElementById('allDataImportFile').addEventListener('change', function() {
+            const file = this.files[0];
+            this.value = '';
+            importAllDataFile(file);
+        });
+
+        let lastTestsSnapshot = {};
         function saveTests() {
-            localStorage.setItem('tests', JSON.stringify(tests));
+            const current = Object.fromEntries(tests.map(test => [test.id, structuredClone(test)]));
+            const previous = lastTestsSnapshot;
+            lastTestsSnapshot = current;
+            persistCollection('tests', previous, current).catch(() => {});
         }
 
         // Модальные окна
@@ -2949,5 +3143,6 @@
             }
         }
     </script>
+    <script type="module" src="./firebase-service.js"></script>
 </body>
 </html>
