@@ -1,0 +1,9 @@
+// ADD this match block INSIDE your EXISTING:
+// service cloud.firestore { match /databases/{database}/documents { ... } }
+// Keep every existing rule for the two other applications unchanged.
+// This file is a snippet, NOT a replacement Firestore ruleset.
+match /testAppUsers/{userId}/{kind}/{documentId} {
+  allow read, write: if request.auth != null
+    && request.auth.uid == userId
+    && kind in ['tests', 'results', 'progress'];
+}
