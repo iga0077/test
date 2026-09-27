@@ -1,8 +1,7 @@
 // Firebase web SDK, без npm и сборщика: подходит для GitHub Pages.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
-import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-storage.js';
+import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 import { firebaseConfig } from './firebase-config.js';
 
 const kinds = new Set(['tests', 'results', 'progress']);
@@ -19,20 +18,17 @@ if (!configured) {
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = firebaseConfig.storageBucket && !firebaseConfig.storageBucket.includes('PASTE_')
-            ? getStorage(app)
-            : null;
         const provider = new GoogleAuthProvider();
 
         function userRef(uid, kind, id) {
             if (!kinds.has(kind) || !uid || !id) throw new Error('Некорректный путь документа');
             if (auth.currentUser?.uid !== uid) throw new Error('Сессия пользователя изменилась');
-            return doc(db, 'users', uid, kind, id);
+            return doc(db, 'testAppUsers', uid, kind, id);
         }
 
         async function getCollection(uid, kind) {
             if (auth.currentUser?.uid !== uid) throw new Error('Сессия пользователя изменилась');
-            const snapshot = await getDocs(collection(db, 'users', uid, kind));
+            const snapshot = await getDocs(collection(db, 'testAppUsers', uid, kind));
             return snapshot.docs;
         }
 
@@ -57,23 +53,42 @@ if (!configured) {
             remove(uid, kind, id) {
                 return deleteDoc(userRef(uid, kind, id));
             },
-            async uploadImage(file) {
-                const user = auth.currentUser;
-                if (!user) throw new Error('Сначала войди через Google');
-                if (!storage) throw new Error('Cloud Storage не настроен. Используй ссылку на изображение либо подключи Storage.');
-                if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
-                    throw new Error('Допустимы только JPG, PNG, WebP и GIF');
+            // Import replaces the current user's dataset as one atomic Firestore batch.
+            async replaceBackup(uid, existing, backup) {
+                if (auth.currentUser?.uid !== uid) throw new Error('Аккаунт изменился');
+                const incoming = {
+                    tests: Object.fromEntries(backup.tests.map(t => [t.id, t])),
+                    results: backup.results || {},
+                    progress: backup.progress || {}
+                };
+                const batch = writeBatch(db);
+                let operationCount = 0;
+                let totalBytes = 0;
+                for (const kind of kinds) {
+                    const oldIds = Object.keys(existing[kind] || {});
+                    const newIds = Object.keys(incoming[kind]);
+                    for (const id of oldIds) {
+                        if (!(id in incoming[kind])) {
+                            batch.delete(userRef(uid, kind, id));
+                            operationCount++;
+                        }
+                    }
+                    for (const id of newIds) {
+                        const value = incoming[kind][id];
+                        const bytes = new TextEncoder().encode(JSON.stringify(value)).length;
+                        if (bytes > 900000) {
+                            throw new Error('Документ ' + kind + '/' + id + ' слишком большой для Firestore (возможно, встроенные изображения). Используй внешние URL.');
+                        }
+                        totalBytes += bytes;
+                        batch.set(userRef(uid, kind, id), value);
+                        operationCount++;
+                    }
                 }
-                if (file.size > 1.5 * 1024 * 1024) throw new Error('Изображение должно быть не больше 1,5 МБ');
-                const extension = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }[file.type];
-                const path = ref(storage, `users/${user.uid}/images/${crypto.randomUUID()}.${extension}`);
-                await uploadBytes(path, file, { contentType: file.type });
-                return getDownloadURL(path);
-            },
-            async uploadDataUrl(dataUrl) {
-                const response = await fetch(dataUrl);
-                if (!response.ok) throw new Error('Не удалось прочитать старое изображение');
-                return this.uploadImage(await response.blob());
+                // Firestore's 500-write and 10-MiB request ceilings: leave headroom.
+                if (operationCount > 400 || totalBytes > 8000000) {
+                    throw new Error('Резервная копия слишком большая для одного безопасного импорта. Облачные данные не изменены.');
+                }
+                await batch.commit();
             }
         };
 
