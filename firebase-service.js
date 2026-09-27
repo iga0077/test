@@ -32,6 +32,24 @@ if (!configured) {
             return snapshot.docs;
         }
 
+        // Firestore forbids an array directly inside another array. Compare drafts
+        // contain comparisonPairs: [[leftId, rightId], ...]. Serialize only progress
+        // as JSON so original data is preserved and exported backups stay compatible.
+        // Existing progress documents written as ordinary objects remain readable.
+        const PROGRESS_FORMAT = 'progress-json-v1';
+        function encodeDocument(kind, value) {
+            return kind === 'progress'
+                ? { format: PROGRESS_FORMAT, payload: JSON.stringify(value) }
+                : value;
+        }
+
+        function decodeDocument(kind, value) {
+            if (kind === 'progress' && value?.format === PROGRESS_FORMAT && typeof value.payload === 'string') {
+                return JSON.parse(value.payload);
+            }
+            return value;
+        }
+
         window.cloud = {
             signIn() { return signInWithPopup(auth, provider); },
             signOut() { return signOut(auth); },
@@ -44,11 +62,11 @@ if (!configured) {
                 return {
                     tests: testDocs.map(item => ({ ...item.data(), id: item.id })),
                     results: Object.fromEntries(resultDocs.map(item => [item.id, item.data()])),
-                    progress: Object.fromEntries(progressDocs.map(item => [item.id, item.data()]))
+                    progress: Object.fromEntries(progressDocs.map(item => [item.id, decodeDocument('progress', item.data())]))
                 };
             },
             put(uid, kind, id, value) {
-                return setDoc(userRef(uid, kind, id), value);
+                return setDoc(userRef(uid, kind, id), encodeDocument(kind, value));
             },
             remove(uid, kind, id) {
                 return deleteDoc(userRef(uid, kind, id));
@@ -74,7 +92,7 @@ if (!configured) {
                         }
                     }
                     for (const id of newIds) {
-                        const value = incoming[kind][id];
+                        const value = encodeDocument(kind, incoming[kind][id]);
                         const bytes = new TextEncoder().encode(JSON.stringify(value)).length;
                         if (bytes > 900000) {
                             throw new Error('Документ ' + kind + '/' + id + ' слишком большой для Firestore (возможно, встроенные изображения). Используй внешние URL.');
