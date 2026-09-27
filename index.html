@@ -1293,6 +1293,7 @@
                 const data = await window.cloud.load(user.uid);
                 if (epoch !== cloudEpoch || cloudUid !== user.uid) return;
                 tests = data.tests;
+                lastTestsSnapshot = Object.fromEntries(tests.map(test => [test.id, structuredClone(test)]));
                 cloudResults = data.results;
                 cloudProgress = data.progress;
                 cloudReady = true;
@@ -1348,7 +1349,15 @@
 
         async function normalizeCloudImages(value) {
             const copy = structuredClone(value);
-            const variants = Array.isArray(copy) ? copy.flatMap(t => t.variants || []) : (copy?.variants || []);
+            const variants = [];
+            function gather(node) {
+                if (!node || typeof node !== 'object') return;
+                if (Array.isArray(node)) return node.forEach(gather);
+                if (Array.isArray(node.variants)) variants.push(...node.variants);
+                if (node.compare) gather(node.compare);
+                if (node.tierlist) gather(node.tierlist);
+            }
+            gather(copy);
             for (const variant of variants) {
                 if (typeof variant.image === 'string' && variant.image.startsWith('data:image/')) {
                     variant.image = await window.cloud.uploadDataUrl(variant.image);
@@ -1385,8 +1394,7 @@
             if (!Array.isArray(oldTests)) return cloudMessage('Некорректный формат старых тестов.', true);
             const already = new Set(tests.map(t => t.id));
             const incoming = oldTests.filter(t => t?.id && !already.has(t.id));
-            const importedIds = new Set(incoming.map(t => t.id));
-            if (!incoming.length) return cloudMessage('Новых локальных тестов для импорта нет.');
+             if (!incoming.length) return cloudMessage('Новых локальных тестов для импорта нет.');
             if (!window.confirm('Импортировать ' + incoming.length + ' локальных тестов и их результаты в текущий Google-аккаунт? Старые локальные данные останутся нетронутыми.')) return;
             const button = document.getElementById('cloudImportButton');
             button.disabled = true;
@@ -1436,7 +1444,7 @@
         const DEFAULT_TIER_LABELS = ['S', 'A', 'B', 'C', 'D'];
 
         function getResultsStore() {
-            return cloudResults;
+            return structuredClone(cloudResults);
         }
 
         function setResultsStore(store) {
@@ -1533,7 +1541,7 @@
         }
 
         function getProgressStore() {
-            return cloudProgress;
+            return structuredClone(cloudProgress);
         }
 
         function setProgressStore(store) {
@@ -1681,12 +1689,10 @@
 
         // Авторизация сама загружает данные; до неё приложение закрыто.
 
-        window.addEventListener('beforeunload', function() {
-            if (document.getElementById('takeTest').classList.contains('active')) {
-                saveCompareProgress();
-            }
-            if (document.getElementById('takeTierList').classList.contains('active')) {
-                saveTierListProgress();
+        window.addEventListener('beforeunload', function(event) {
+            if (cloudWriteCount || pendingImageUploads.size) {
+                event.preventDefault();
+                event.returnValue = '';
             }
         });
 
