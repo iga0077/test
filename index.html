@@ -1,0 +1,2953 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Тесты на лучшие игры/аниме</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0c0e14;
+            --bg-card: rgba(22, 27, 38, 0.85);
+            --bg-card-hover: rgba(28, 35, 50, 0.95);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-strong: rgba(255, 255, 255, 0.14);
+            --text: #e8ecf4;
+            --text-muted: #9aa3b5;
+            --accent: #7c6cf0;
+            --accent-hover: #9588f5;
+            --accent-glow: rgba(124, 108, 240, 0.35);
+            --success: #3ecf8e;
+            --success-hover: #35b87c;
+            --danger: #f07178;
+            --danger-hover: #e85a62;
+            --radius: 14px;
+            --radius-sm: 10px;
+            --shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            color: var(--text);
+            font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.55;
+            background: var(--bg-deep);
+            background-image:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 108, 240, 0.22), transparent),
+                radial-gradient(ellipse 60% 40% at 100% 100%, rgba(62, 207, 142, 0.08), transparent);
+        }
+
+        .app-header {
+            padding: 28px 20px 8px;
+            text-align: center;
+        }
+
+        .app-header h1 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #fff 0%, #c4bcff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .app-header .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 12px 20px 48px;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        .page-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        h3, h4 {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .screen h3 {
+            margin: 24px 0 16px;
+            font-size: 1rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 0.75rem;
+        }
+
+        .navigation {
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            border: 1px solid var(--border-strong);
+            padding: 11px 20px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            font-family: inherit;
+            transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+        }
+
+        .button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .button:active {
+            transform: scale(0.98);
+        }
+
+        .button.primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #5b4fd4 100%);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .button.primary:hover {
+            background: linear-gradient(135deg, var(--accent-hover) 0%, #6d5fe0 100%);
+            box-shadow: 0 6px 28px var(--accent-glow);
+        }
+
+        .button.secondary {
+            background: rgba(62, 207, 142, 0.12);
+            border-color: rgba(62, 207, 142, 0.35);
+            color: #8eedc0;
+        }
+
+        .button.secondary:hover {
+            background: rgba(62, 207, 142, 0.2);
+        }
+
+        .button.danger {
+            background: rgba(240, 113, 120, 0.12);
+            border-color: rgba(240, 113, 120, 0.35);
+            color: #ffb3b8;
+        }
+
+        .button.danger:hover {
+            background: rgba(240, 113, 120, 0.22);
+        }
+
+        .button.ghost {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--text-muted);
+            padding: 9px 16px;
+            font-size: 0.875rem;
+        }
+
+        .button.ghost:hover {
+            color: var(--text);
+            border-color: var(--border-strong);
+        }
+
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .menu-card {
+            text-align: left;
+            padding: 22px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
+            font-family: inherit;
+            color: inherit;
+            width: 100%;
+        }
+
+        .menu-card:hover {
+            border-color: rgba(124, 108, 240, 0.45);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .menu-card-icon {
+            font-size: 1.75rem;
+            margin-bottom: 12px;
+            line-height: 1;
+        }
+
+        .menu-card-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        .menu-card-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        .field-hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin: -4px 0 10px;
+            line-height: 1.45;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #5c6578;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .card-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .test-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            border: 1px solid var(--border);
+            transition: border-color 0.2s;
+        }
+
+        .test-card:hover {
+            border-color: var(--border-strong);
+        }
+
+        .test-card h3 {
+            margin: 0 0 8px;
+            font-size: 1.1rem;
+            color: #fff;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .test-card-meta {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(124, 108, 240, 0.2);
+            color: #c4bcff;
+            margin-bottom: 12px;
+        }
+
+        .variant-item {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 52px 12px 12px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .variant-fields {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+            gap: 10px;
+            align-items: center;
+        }
+
+        .variant-item .input-group,
+        .variant-item .variant-image-field {
+            margin: 0;
+        }
+
+        .variant-image-control {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-button {
+            width: 44px;
+            height: 44px;
+            flex: 0 0 44px;
+            padding: 0;
+            border-radius: var(--radius-sm);
+        }
+
+        .icon-button svg {
+            width: 19px;
+            height: 19px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .variant-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 620px) {
+            .variant-item {
+                padding-right: 48px;
+            }
+
+            .variant-fields {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-wrap {
+            margin-top: 8px;
+        }
+
+        body.mode-comparison {
+            overflow: hidden;
+        }
+
+        body.mode-comparison .app-header {
+            display: none;
+        }
+
+        body.mode-comparison #mainContainer {
+            max-width: none;
+            padding: 0;
+            height: 100dvh;
+        }
+
+        #takeTest .panel.comparison-wrap {
+            min-height: 100dvh;
+            height: 100dvh;
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 14px 12px;
+            margin: 0;
+        }
+
+        #takeTest .comparison-wrap .navigation {
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        #takeTest .comparison-wrap .page-title {
+            font-size: 1rem;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+
+        #takeTest .progress-header,
+        #takeTest .progress-bar {
+            flex-shrink: 0;
+            margin-bottom: 8px;
+        }
+
+        #takeTest #comparisonContainer {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 12px;
+            align-items: stretch;
+            margin-bottom: 24px;
+        }
+
+        #takeTest .comparison-container {
+            flex: 1;
+            min-height: 0;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 640px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr auto 1fr;
+            }
+            .comparison-vs {
+                padding: 4px 0;
+            }
+        }
+
+        .comparison-item {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.22);
+            border-radius: var(--radius);
+            padding: 20px 16px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+        }
+
+        #takeTest .comparison-item {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            padding: 10px 12px;
+            overflow: hidden;
+        }
+
+        .comparison-item:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent-glow), 0 12px 32px rgba(0, 0, 0, 0.35);
+            transform: translateY(-2px);
+        }
+
+        #takeTest .comparison-item:hover {
+            transform: none;
+        }
+
+        .comparison-item img {
+            width: 100%;
+            max-height: min(62vh, 440px);
+            height: auto;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
+        }
+
+        #takeTest .comparison-item img {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            height: 100%;
+            max-height: none;
+            margin-bottom: 0;
+            object-fit: contain;
+        }
+
+        #takeTest .comparison-item-footer {
+            flex-shrink: 0;
+            padding-top: 8px;
+        }
+
+        #takeTest .comparison-controls {
+            flex-shrink: 0;
+            padding: 12px 16px;
+            margin-bottom: 0;
+        }
+
+        .comparison-edit-btn {
+            margin-top: 6px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+        }
+
+        .tier-variant-chip {
+            position: relative;
+        }
+
+        .tier-chip-edit {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 26px;
+            height: 26px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            cursor: pointer;
+            font-size: 0.75rem;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .tier-chip-edit:hover {
+            background: var(--accent);
+        }
+
+        .draft-badge {
+            background: rgba(255, 193, 77, 0.18);
+            color: #ffd666;
+        }
+
+        .comparison-item h3 {
+            margin: 0 0 8px;
+            font-size: 1.05rem;
+            color: #fff;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .comparison-item p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .comparison-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            opacity: 0.85;
+        }
+
+        .comparison-vs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+        }
+
+        .comparison-controls {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius);
+            border: 1px dashed var(--border-strong);
+        }
+
+        .comparison-step {
+            margin-top: 12px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            background: rgba(0, 0, 0, 0.35);
+            height: 8px;
+            border-radius: 999px;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--accent), #a78bfa);
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.35s ease;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .results-table th {
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+        }
+
+        .results-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .results-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .results-table img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .place-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border-radius: 8px;
+            font-weight: 700;
+            background: rgba(124, 108, 240, 0.2);
+            color: #c4bcff;
+        }
+
+        .place-badge.gold {
+            background: rgba(255, 193, 77, 0.2);
+            color: #ffd666;
+        }
+
+        .place-badge.silver {
+            background: rgba(192, 192, 210, 0.15);
+            color: #d4d4e8;
+        }
+
+        .place-badge.bronze {
+            background: rgba(205, 127, 80, 0.2);
+            color: #e8a87c;
+        }
+
+        .score-cell {
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .add-variant-form {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius);
+            padding: 22px;
+            border: 1px solid var(--border);
+        }
+
+        .add-variant-form h4 {
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 24px;
+            color: var(--text-muted);
+            border: 1px dashed var(--border-strong);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .empty-state-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 28px;
+            max-width: 440px;
+            width: 100%;
+            border: 1px solid var(--border-strong);
+            box-shadow: var(--shadow);
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--text-muted);
+            border: none;
+            background: none;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .container--wide {
+            max-width: 1100px;
+        }
+
+        .badge.mode-badge {
+            background: rgba(62, 207, 142, 0.15);
+            color: #8eedc0;
+        }
+
+        .badge.mode-badge.tier {
+            background: rgba(255, 127, 127, 0.15);
+            color: #ffb3b3;
+        }
+
+        .tierlist-panel {
+            padding: 20px 22px;
+        }
+
+        .tierlist-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .tierlist-board {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .tier-row {
+            display: grid;
+            grid-template-columns: 72px 1fr;
+            min-height: 88px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .tier-row-unranked {
+            min-height: 100px;
+            margin-bottom: 8px;
+            border-style: dashed;
+        }
+
+        .tier-label-col {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: center;
+            padding: 8px 6px;
+            background: var(--tier-color, #4a5568);
+            color: #111;
+            font-weight: 800;
+        }
+
+        .tier-row-unranked .tier-label-col {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .tier-label-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: inherit;
+            font-weight: 800;
+            font-size: 1.25rem;
+            text-align: center;
+            font-family: inherit;
+            padding: 4px 2px;
+        }
+
+        .tier-label-input:focus {
+            outline: 2px solid rgba(0, 0, 0, 0.25);
+            border-radius: 4px;
+        }
+
+        .tier-remove {
+            margin-top: 4px;
+            border: none;
+            background: rgba(0, 0, 0, 0.15);
+            color: inherit;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            padding: 2px 4px;
+            opacity: 0.85;
+        }
+
+        .tier-remove:hover {
+            opacity: 1;
+        }
+
+        .tier-dropzone {
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 8px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.28);
+            min-height: 88px;
+            transition: background 0.15s, box-shadow 0.15s;
+        }
+
+        .tier-dropzone.drag-over {
+            background: rgba(124, 108, 240, 0.12);
+            box-shadow: inset 0 0 0 2px var(--accent);
+        }
+
+        .tier-dropzone.select-target {
+            cursor: pointer;
+        }
+
+        .tier-variant-chip {
+            width: 88px;
+            cursor: grab;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.06);
+            transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+        }
+
+        .tier-variant-chip:active {
+            cursor: grabbing;
+        }
+
+        .tier-variant-chip.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+            transform: scale(1.04);
+        }
+
+        .tier-variant-chip img {
+            width: 100%;
+            height: 72px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .tier-variant-chip span {
+            display: block;
+            font-size: 0.65rem;
+            padding: 4px 5px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text);
+        }
+
+        .tierlist-readonly .tier-label-readonly {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #111;
+        }
+
+        .tierlist-readonly .tier-row-unranked .tier-label-readonly {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .image-preview {
+            cursor: zoom-in;
+        }
+
+        .image-lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(0, 0, 0, 0.92);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .image-lightbox.active {
+            display: flex;
+        }
+
+        .image-lightbox-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1.75rem;
+            line-height: 1;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .image-lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .image-lightbox img {
+            max-width: min(96vw, 1400px);
+            max-height: 82vh;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+            cursor: zoom-out;
+        }
+
+        .image-lightbox-caption {
+            margin-top: 16px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            text-align: center;
+            max-width: 90vw;
+        }
+
+        .image-fallback {
+            padding: 12px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: rgba(240, 113, 120, 0.08);
+            border: 1px dashed rgba(240, 113, 120, 0.35);
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+        }
+
+        .image-fallback a {
+            color: #ffb3b8;
+            word-break: break-all;
+        }
+
+        #takeTest .comparison-item .image-fallback {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <h1>Тесты на лучшие игры / аниме</h1>
+        <p class="subtitle">Попарные тесты и тир-листы — всё хранится в браузере</p>
+    </header>
+
+    <div id="mainContainer" class="container">
+        <!-- Главное меню -->
+        <div id="mainMenu" class="screen active">
+            <div class="panel">
+                <p class="page-title">Что хотите сделать?</p>
+                <p class="page-desc">Создайте тест с картинками или продолжите уже начатый.</p>
+                <div class="menu-grid">
+                    <button type="button" class="menu-card" onclick="showCreateTest()">
+                        <div class="menu-card-icon">✨</div>
+                        <div class="menu-card-title">Создать тест</div>
+                        <div class="menu-card-desc">Добавьте название и варианты со ссылками на изображения</div>
+                    </button>
+                    <button type="button" class="menu-card" onclick="showTestsList()">
+                        <div class="menu-card-icon">▶</div>
+                        <div class="menu-card-title">Пройти тест</div>
+                        <div class="menu-card-desc">Попарное сравнение или тир-лист S–D</div>
+                    </button>
+                    <button type="button" class="menu-card" onclick="showResultsList()">
+                        <div class="menu-card-icon">📊</div>
+                        <div class="menu-card-title">Результаты</div>
+                        <div class="menu-card-desc">Таблица мест, очки и добавление новых вариантов</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Создание теста -->
+        <div id="createTest" class="screen">
+            <div class="panel">
+                <div class="navigation">
+                    <button type="button" class="button ghost" onclick="showMainMenu()">← На главную</button>
+                </div>
+                <p class="page-title">Новый тест</p>
+                <div class="input-group">
+                    <input type="text" id="testName" placeholder="Имя теста">
+                </div>
+                <div id="variantsList"></div>
+                <div class="btn-row">
+                    <button type="button" class="button secondary" onclick="addVariant()">+ Добавить вариант</button>
+                    <button type="button" class="button" onclick="triggerVariantsTextFile('create')">Загрузить .txt</button>
+                    <input type="file" id="createVariantsTextFile" accept=".txt,text/plain" hidden>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="button primary" onclick="saveTest()">Сохранить тест</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список тестов -->
+        <div id="testsList" class="screen">
+            <div class="panel">
+                <div class="navigation">
+                    <button type="button" class="button ghost" onclick="showMainMenu()">← На главную</button>
+                </div>
+                <p class="page-title">Доступные тесты</p>
+                <p class="page-desc">Запуск, редактирование или удаление.</p>
+                <div id="testsContainer" class="card-grid"></div>
+            </div>
+        </div>
+
+        <!-- Тир-лист -->
+        <div id="takeTierList" class="screen">
+            <div class="panel tierlist-panel">
+                <div class="navigation btn-row">
+                    <button type="button" class="button ghost" onclick="saveTierListProgressAndExit()">← Сохранить и выйти</button>
+                </div>
+                <p class="page-title" id="tierListTestName"></p>
+                <p class="tierlist-hint">Перетащите варианты по тирам или нажмите на название, затем на тир. Клик по картинке — увеличить. Названия тиров можно менять.</p>
+                <div id="tierListBoard" class="tierlist-board"></div>
+                <div class="form-actions">
+                    <button type="button" class="button secondary" onclick="addTierRow()">+ Добавить тир</button>
+                    <button type="button" class="button" onclick="resetTierListPlacement()">Сбросить расстановку</button>
+                    <button type="button" class="button primary" onclick="saveTierListResult()">Сохранить тир-лист</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Прохождение теста -->
+        <div id="takeTest" class="screen">
+            <div class="panel comparison-wrap">
+                <div class="navigation btn-row">
+                    <button type="button" class="button ghost" onclick="saveCompareProgressAndExit()">← Сохранить и выйти</button>
+                </div>
+                <p class="page-title" id="currentTestName"></p>
+                <div class="progress-header">
+                    <span>Прогресс</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="comparisonContainer"></div>
+            </div>
+        </div>
+
+        <!-- Результаты тестов -->
+        <div id="resultsList" class="screen">
+            <div class="panel">
+                <div class="navigation">
+                    <button type="button" class="button ghost" onclick="showMainMenu()">← На главную</button>
+                </div>
+                <p class="page-title">Результаты</p>
+                <p class="page-desc">История прохождений сохранённых тестов.</p>
+                <div id="resultsContainer" class="card-grid"></div>
+            </div>
+        </div>
+
+        <!-- Просмотр результата конкретного теста -->
+        <div id="testResult" class="screen">
+            <div class="panel">
+                <div class="navigation">
+                    <button type="button" class="button ghost" onclick="showResultsList()">← К результатам</button>
+                </div>
+                <p class="page-title" id="resultTestName"></p>
+                <div id="resultActions" class="btn-row" style="margin-bottom: 24px;">
+                    <button type="button" class="button primary" onclick="retakeTest()">Пройти заново</button>
+                    <button type="button" class="button secondary" onclick="showAddVariants()">Добавить варианты</button>
+                </div>
+                <div id="resultTable"></div>
+            </div>
+        </div>
+
+        <!-- Добавление вариантов в существующий тест -->
+        <div id="addVariants" class="screen">
+            <div class="panel">
+                <div class="navigation">
+                    <button type="button" class="button ghost" onclick="showTestResult()">← К результатам</button>
+                </div>
+                <p class="page-title">Новые варианты</p>
+                <div class="add-variant-form">
+                    <div id="newVariantsList"></div>
+                    <div class="btn-row">
+                        <button type="button" class="button secondary" onclick="addNewVariant()">+ Добавить вариант</button>
+                        <button type="button" class="button" onclick="triggerVariantsTextFile('new')">Загрузить .txt</button>
+                        <input type="file" id="newVariantsTextFile" accept=".txt,text/plain" hidden>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="button primary" onclick="saveNewVariants()">Сохранить и пройти сравнения</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Редактирование теста -->
+        <div id="editTest" class="screen">
+            <div class="panel">
+                <div class="navigation">
+                    <button type="button" class="button ghost" onclick="showTestsList()">← К тестам</button>
+                </div>
+                <p class="page-title">Редактирование</p>
+                <div class="input-group">
+                    <input type="text" id="editTestName" placeholder="Имя теста">
+                </div>
+                <div id="editVariantsList"></div>
+                <div class="btn-row">
+                    <button type="button" class="button secondary" onclick="addEditVariant()">+ Добавить вариант</button>
+                    <button type="button" class="button" onclick="triggerVariantsTextFile('edit')">Загрузить .txt</button>
+                    <input type="file" id="editVariantsTextFile" accept=".txt,text/plain" hidden>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="button primary" onclick="saveEditedTest()">Сохранить</button>
+                    <button type="button" class="button danger" onclick="cancelEdit()">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageLightbox" class="image-lightbox" onclick="closeImageLightbox()" role="dialog" aria-modal="true" aria-label="Просмотр изображения">
+        <button type="button" class="image-lightbox-close" onclick="event.stopPropagation(); closeImageLightbox();" aria-label="Закрыть">&times;</button>
+        <img id="imageLightboxImg" src="" alt="" onclick="event.stopPropagation(); closeImageLightbox();">
+        <p id="imageLightboxCaption" class="image-lightbox-caption"></p>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let tests = JSON.parse(localStorage.getItem('tests') || '[]');
+        let currentTest = null;
+        let currentComparisons = [];
+        let currentComparisonIndex = 0;
+        let currentResults = {};
+        let currentTestId = null;
+        let variantCounter = 0;
+        let newVariantCounter = 0;
+        let currentResultMode = 'compare';
+        let tierListState = null;
+        let tierListSelectedVariantId = null;
+        let compareSessionTitleSuffix = '';
+        let compareVoteHistory = [];
+        let editingVariantIdDuringSession = null;
+        let modalConfirmAction = null;
+        const PROGRESS_STORAGE_KEY = 'testProgress';
+        const TIER_COLORS = ['#ff7f7f', '#ffbf7f', '#ffff7f', '#a8e06c', '#7fbfff', '#c49bff', '#b8c0d0'];
+        const DEFAULT_TIER_LABELS = ['S', 'A', 'B', 'C', 'D'];
+
+        function getResultsStore() {
+            return JSON.parse(localStorage.getItem('testResults') || '{}');
+        }
+
+        function setResultsStore(store) {
+            localStorage.setItem('testResults', JSON.stringify(store));
+        }
+
+        function normalizeResultSlot(entry) {
+            if (!entry) {
+                return { compare: null, tierlist: null };
+            }
+            if ('compare' in entry || 'tierlist' in entry) {
+                return {
+                    compare: entry.compare || null,
+                    tierlist: entry.tierlist || null
+                };
+            }
+            if (entry.mode === 'tierlist') {
+                return { compare: null, tierlist: entry };
+            }
+            return { compare: entry, tierlist: null };
+        }
+
+        function getResultSlot(testId) {
+            const store = getResultsStore();
+            return normalizeResultSlot(store[testId]);
+        }
+
+        function ensureStoreSlot(store, testId) {
+            const slot = normalizeResultSlot(store[testId]);
+            store[testId] = slot;
+            return slot;
+        }
+
+        function migrateAllResults() {
+            const store = getResultsStore();
+            let changed = false;
+            Object.keys(store).forEach(testId => {
+                const before = store[testId];
+                const after = normalizeResultSlot(before);
+                if (JSON.stringify(before) !== JSON.stringify(after)) {
+                    store[testId] = after;
+                    changed = true;
+                }
+            });
+            if (changed) {
+                setResultsStore(store);
+            }
+        }
+
+        function listResultEntries() {
+            migrateAllResults();
+            const store = getResultsStore();
+            const entries = [];
+            Object.entries(store).forEach(([testId, raw]) => {
+                const { compare, tierlist } = normalizeResultSlot(raw);
+                if (compare) {
+                    entries.push({ testId, mode: 'compare', result: compare });
+                }
+                if (tierlist) {
+                    entries.push({ testId, mode: 'tierlist', result: tierlist });
+                }
+            });
+            entries.sort((a, b) => new Date(b.result.date) - new Date(a.result.date));
+            return entries;
+        }
+
+        function persistCompareResult(testId, payload) {
+            const store = getResultsStore();
+            const slot = ensureStoreSlot(store, testId);
+            slot.compare = {
+                mode: 'compare',
+                testName: payload.testName,
+                results: payload.results,
+                date: payload.date,
+                variants: payload.variants
+            };
+            setResultsStore(store);
+        }
+
+        function persistTierListResult(testId, payload) {
+            const store = getResultsStore();
+            const slot = ensureStoreSlot(store, testId);
+            slot.tierlist = {
+                mode: 'tierlist',
+                testName: payload.testName,
+                date: payload.date,
+                variants: payload.variants,
+                tiers: payload.tiers,
+                unassigned: payload.unassigned
+            };
+            setResultsStore(store);
+        }
+
+        function getProgressStore() {
+            return JSON.parse(localStorage.getItem(PROGRESS_STORAGE_KEY) || '{}');
+        }
+
+        function setProgressStore(store) {
+            localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(store));
+        }
+
+        function getTestProgress(testId) {
+            return getProgressStore()[testId] || { compare: null, tierlist: null };
+        }
+
+        function clearCompareProgress(testId) {
+            const store = getProgressStore();
+            if (!store[testId]) return;
+            store[testId].compare = null;
+            if (!store[testId].tierlist) delete store[testId];
+            setProgressStore(store);
+        }
+
+        function clearTierListProgress(testId) {
+            const store = getProgressStore();
+            if (!store[testId]) return;
+            store[testId].tierlist = null;
+            if (!store[testId].compare) delete store[testId];
+            setProgressStore(store);
+        }
+
+        function clearAllProgress(testId) {
+            const store = getProgressStore();
+            delete store[testId];
+            setProgressStore(store);
+        }
+
+        function saveCompareProgress() {
+            if (!currentTestId || !currentTest) return;
+            const store = getProgressStore();
+            if (!store[currentTestId]) store[currentTestId] = { compare: null, tierlist: null };
+            store[currentTestId].compare = {
+                comparisonPairs: currentComparisons.map(p => [p[0], p[1]]),
+                currentComparisonIndex,
+                currentResults: { ...currentResults },
+                voteHistory: compareVoteHistory.map(entry => ({ ...entry })),
+                titleSuffix: compareSessionTitleSuffix,
+                updatedAt: new Date().toISOString()
+            };
+            setProgressStore(store);
+        }
+
+        function saveTierListProgress() {
+            if (!currentTestId || !tierListState) return;
+            const store = getProgressStore();
+            if (!store[currentTestId]) store[currentTestId] = { compare: null, tierlist: null };
+            store[currentTestId].tierlist = {
+                tierListState: {
+                    tiers: tierListState.tiers.map(t => ({
+                        id: t.id,
+                        label: t.label,
+                        variantIds: [...t.variantIds]
+                    })),
+                    unassigned: [...tierListState.unassigned]
+                },
+                titleSuffix: compareSessionTitleSuffix,
+                updatedAt: new Date().toISOString()
+            };
+            setProgressStore(store);
+        }
+
+        function saveCompareProgressAndExit() {
+            saveCompareProgress();
+            alert('Прогресс сравнения сохранён. Можно продолжить из списка тестов.');
+            showTestsList();
+        }
+
+        function saveTierListProgressAndExit() {
+            saveTierListProgress();
+            alert('Черновик тир-листа сохранён. Можно продолжить из списка тестов.');
+            showTestsList();
+        }
+
+        function updateVariantInCurrentTest(variantId, patch) {
+            const testIndex = tests.findIndex(t => t.id === currentTestId);
+            if (testIndex < 0) return;
+            const variant = tests[testIndex].variants.find(v => v.id === variantId);
+            if (!variant) return;
+            Object.assign(variant, patch);
+            saveTests();
+            currentTest = tests[testIndex];
+        }
+
+        function openEditVariantDuringTest(variantId) {
+            const variant = getVariantById(variantId);
+            if (!variant) return;
+            editingVariantIdDuringSession = variantId;
+            showModal(`
+                <h3 style="margin-bottom:16px;color:#fff;">Изменить вариант</h3>
+                <div id="modalVariantEditForm">
+                    ${variantImageFieldHtml()}
+                    <div class="input-group">
+                        <label>Название</label>
+                        <input type="text" id="modalVariantName" value="${escapeHtml(variant.name)}">
+                    </div>
+                    <div class="btn-row" style="margin-top:16px;">
+                        <button type="button" class="button primary" onclick="saveVariantEditFromModal()">Сохранить</button>
+                        <button type="button" class="button" onclick="closeModal()">Отмена</button>
+                    </div>
+                </div>
+            `);
+            const form = document.getElementById('modalVariantEditForm');
+            setupVariantImageField(form);
+            form.querySelector('.variant-image-url').value = variant.image;
+        }
+
+        function saveVariantEditFromModal() {
+            const variantId = editingVariantIdDuringSession;
+            const form = document.getElementById('modalVariantEditForm');
+            if (!variantId || !form) return;
+            const image = form.querySelector('.variant-image-url').value.trim();
+            const name = document.getElementById('modalVariantName').value.trim();
+            if (!image && !name) {
+                alert('Укажите имя или изображение');
+                return;
+            }
+            updateVariantInCurrentTest(variantId, {
+                image,
+                name: name || 'Вариант'
+            });
+            closeModal();
+            editingVariantIdDuringSession = null;
+            if (document.getElementById('takeTest').classList.contains('active')) {
+                showNextComparison();
+                saveCompareProgress();
+            } else if (document.getElementById('takeTierList').classList.contains('active')) {
+                renderTierListBoard();
+                saveTierListProgress();
+            }
+        }
+
+        function getComparisonPairAt(index) {
+            const pair = currentComparisons[index];
+            if (!pair) return [null, null];
+            return [getVariantById(pair[0]), getVariantById(pair[1])];
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            migrateAllResults();
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (document.getElementById('takeTest').classList.contains('active')) {
+                saveCompareProgress();
+            }
+            if (document.getElementById('takeTierList').classList.contains('active')) {
+                saveTierListProgress();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeImageLightbox();
+            }
+        });
+
+        function openImagePreview(src, alt) {
+            if (!src) return;
+            const box = document.getElementById('imageLightbox');
+            const img = document.getElementById('imageLightboxImg');
+            const caption = document.getElementById('imageLightboxCaption');
+            img.referrerPolicy = 'no-referrer';
+            img.src = (src || '').trim();
+            img.alt = alt || '';
+            caption.textContent = alt || '';
+            box.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageLightbox() {
+            const box = document.getElementById('imageLightbox');
+            if (!box.classList.contains('active')) return;
+            box.classList.remove('active');
+            document.getElementById('imageLightboxImg').src = '';
+            document.body.style.overflow = '';
+        }
+
+        function hydrateTierListFromSaved(saved, currentVariants) {
+            const validIds = new Set(currentVariants.map(v => v.id));
+            const tiers = (saved.tiers || []).map(t => ({
+                id: t.id,
+                label: t.label,
+                variantIds: (t.variantIds || []).filter(id => validIds.has(id))
+            }));
+
+            const assigned = new Set();
+            tiers.forEach(t => t.variantIds.forEach(id => assigned.add(id)));
+
+            const unassigned = (saved.unassigned || []).filter(id => validIds.has(id));
+            currentVariants.forEach(v => {
+                if (!assigned.has(v.id) && !unassigned.includes(v.id)) {
+                    unassigned.push(v.id);
+                }
+            });
+
+            if (tiers.length === 0) {
+                return createEmptyTierListState();
+            }
+
+            return { tiers, unassigned };
+        }
+
+        function resetTierListPlacement() {
+            if (!tierListState || !currentTest) return;
+            showConfirmation('Все варианты вернутся в «Без тира». Названия тиров сохранятся.', () => {
+                tierListState.unassigned = currentTest.variants.map(v => v.id);
+                tierListState.tiers.forEach(t => { t.variantIds = []; });
+                tierListSelectedVariantId = null;
+                renderTierListBoard();
+                saveTierListProgress();
+            });
+        }
+
+        // Навигация между экранами
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            document.body.classList.toggle('mode-comparison', screenId === 'takeTest');
+            const mainContainer = document.getElementById('mainContainer');
+            if (mainContainer) {
+                const wide = screenId === 'takeTierList' ||
+                    (screenId === 'testResult' && currentResultMode === 'tierlist');
+                mainContainer.classList.toggle('container--wide', wide);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text == null ? '' : String(text);
+            return div.innerHTML;
+        }
+
+        /** Снижает блокировку hotlink: многие хосты режут картинки с чужого сайта по Referer */
+        const IMG_LOAD_ATTRS = 'referrerpolicy="no-referrer" decoding="async"';
+
+        function displayImageSrc(url) {
+            const src = (url || '').trim();
+            return escapeHtml(src || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="480" height="320"%3E%3Crect width="100%25" height="100%25" fill="%231b2030"/%3E%3C/svg%3E');
+        }
+
+        function isBlockedHotlinkHost(url) {
+            try {
+                const host = new URL(url.trim()).hostname.toLowerCase();
+                return host === 'cdn.donmai.us' || host.endsWith('.donmai.us');
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function handleImageLoadError(img) {
+            if (!img || img.dataset.fallbackDone) return;
+            img.dataset.fallbackDone = '1';
+            img.onerror = null;
+            const original = (img.dataset.originalSrc || img.getAttribute('src') || '').trim();
+            if (!original || original.startsWith('data:')) return;
+
+            img.style.display = 'none';
+            const box = document.createElement('div');
+            box.className = 'image-fallback';
+            const msg = document.createElement('p');
+            msg.textContent = isBlockedHotlinkHost(original)
+                ? 'Danbooru / Cloudflare не даёт встроить картинку по ссылке.'
+                : 'Не удалось загрузить изображение.';
+            box.appendChild(msg);
+
+            const link = document.createElement('a');
+            link.href = original;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = 'Открыть в новой вкладке';
+            box.appendChild(link);
+
+            const hint = document.createElement('p');
+            hint.className = 'field-hint';
+            hint.style.marginTop = '8px';
+            hint.textContent = 'Сохраните файл (ПКМ → «Сохранить как…») и в тесте нажмите «Загрузить файл».';
+            box.appendChild(hint);
+
+            img.insertAdjacentElement('afterend', box);
+        }
+
+        function variantImageFieldHtml() {
+            return `
+                <div class="input-group variant-image-field">
+                    <div class="variant-image-control">
+                        <button type="button" class="button secondary icon-button" onclick="triggerVariantImageFile(this)" aria-label="Загрузить изображение" title="Загрузить файл">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
+                        </button>
+                        <input type="text" class="variant-image-url" placeholder="Изображение" required>
+                    </div>
+                    <input type="file" accept="image/*" class="variant-image-file" hidden>
+                </div>`;
+        }
+
+        function triggerVariantImageFile(btn) {
+            const field = btn.closest('.variant-image-field');
+            if (field) field.querySelector('.variant-image-file').click();
+        }
+
+        function setupVariantImageField(container) {
+            const fileInput = container.querySelector('.variant-image-file');
+            if (!fileInput || fileInput.dataset.bound) return;
+            fileInput.dataset.bound = '1';
+            fileInput.addEventListener('change', function() {
+                const file = fileInput.files[0];
+                if (!file) return;
+                const maxBytes = 1.5 * 1024 * 1024;
+                if (file.size > maxBytes) {
+                    alert('Файл слишком большой (макс. ~1.5 МБ для хранения в браузере).');
+                    fileInput.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function() {
+                    container.querySelector('.variant-image-url').value = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function isVariantLink(value) {
+            try {
+                const url = new URL(value);
+                return url.protocol === 'http:' || url.protocol === 'https:';
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function removeEmptyVariantItems(container) {
+            container.querySelectorAll('.variant-item').forEach(item => {
+                const image = item.querySelector('.variant-image-url')?.value.trim();
+                const nameField = item.querySelector('.variant-name, .new-variant-name');
+                const name = nameField?.value.trim();
+                if (!image && !name) item.remove();
+            });
+        }
+
+        function triggerVariantsTextFile(mode) {
+            document.getElementById(mode + 'VariantsTextFile').click();
+        }
+
+        function importVariantsFromText(mode, text) {
+            const config = {
+                create: { listId: 'variantsList', add: addVariant },
+                new: { listId: 'newVariantsList', add: addNewVariant },
+                edit: { listId: 'editVariantsList', add: addEditVariant }
+            }[mode];
+            if (!config) return;
+
+            const list = document.getElementById(config.listId);
+            removeEmptyVariantItems(list);
+
+            const existingNames = new Set();
+            const existingImages = new Set();
+            list.querySelectorAll('.variant-item').forEach(item => {
+                const name = item.querySelector('.variant-name, .new-variant-name')?.value.trim();
+                const image = item.querySelector('.variant-image-url')?.value.trim();
+                if (name) existingNames.add(name);
+                if (image) existingImages.add(image);
+            });
+
+            let added = 0;
+            let skipped = 0;
+            text.split(/\r?\n/).map(line => line.trim()).filter(Boolean).forEach(line => {
+                const isLink = isVariantLink(line);
+                if ((isLink && existingImages.has(line)) || (!isLink && existingNames.has(line))) {
+                    skipped++;
+                    return;
+                }
+
+                const variant = isLink ? { image: line, name: '' } : { image: '', name: line };
+                if (mode === 'create') config.add(variant);
+                else if (mode === 'new') config.add(variant);
+                else config.add({ id: '', ...variant });
+
+                if (isLink) existingImages.add(line);
+                else existingNames.add(line);
+                added++;
+            });
+
+            alert(added
+                ? `Добавлено вариантов: ${added}${skipped ? `. Пропущено повторов: ${skipped}.` : '.'}`
+                : 'Новых вариантов не найдено.');
+        }
+
+        ['create', 'new', 'edit'].forEach(mode => {
+            document.getElementById(mode + 'VariantsTextFile').addEventListener('change', function() {
+                const file = this.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => importVariantsFromText(mode, String(reader.result || ''));
+                reader.readAsText(file);
+                this.value = '';
+            });
+        });
+
+        function imgTagAttrs(url, className) {
+            const src = displayImageSrc(url);
+            const cls = className ? `class="${className}" ` : '';
+            return `${cls}src="${src}" data-original-src="${src}" ${IMG_LOAD_ATTRS} onerror="handleImageLoadError(this)"`;
+        }
+
+        function getVariantById(variantId) {
+            if (!currentTest || !currentTest.variants) return null;
+            return currentTest.variants.find(v => v.id === variantId) || null;
+        }
+
+        function createDefaultTiers() {
+            return DEFAULT_TIER_LABELS.map((label, index) => ({
+                id: 'tier_' + label.toLowerCase() + '_' + index,
+                label: label,
+                variantIds: []
+            }));
+        }
+
+        function createEmptyTierListState() {
+            return {
+                tiers: createDefaultTiers(),
+                unassigned: currentTest.variants.map(v => v.id)
+            };
+        }
+
+        function findVariantLocation(variantId) {
+            if (tierListState.unassigned.includes(variantId)) {
+                return { zone: 'unassigned' };
+            }
+            for (const tier of tierListState.tiers) {
+                if (tier.variantIds.includes(variantId)) {
+                    return { zone: tier.id };
+                }
+            }
+            return null;
+        }
+
+        function removeVariantFromAllZones(variantId) {
+            tierListState.unassigned = tierListState.unassigned.filter(id => id !== variantId);
+            tierListState.tiers.forEach(tier => {
+                tier.variantIds = tier.variantIds.filter(id => id !== variantId);
+            });
+        }
+
+        function moveVariantToZone(variantId, zoneId) {
+            removeVariantFromAllZones(variantId);
+            if (zoneId === 'unassigned') {
+                tierListState.unassigned.push(variantId);
+            } else {
+                const tier = tierListState.tiers.find(t => t.id === zoneId);
+                if (tier) tier.variantIds.push(variantId);
+            }
+            tierListSelectedVariantId = null;
+            renderTierListBoard();
+            saveTierListProgress();
+        }
+
+        function renderTierVariantChip(variantId) {
+            const variant = getVariantById(variantId);
+            if (!variant) return '';
+            const selected = tierListSelectedVariantId === variantId ? ' selected' : '';
+            return `
+                <div class="tier-variant-chip${selected}" draggable="true" data-variant-id="${variant.id}"
+                     title="${escapeHtml(variant.name)}">
+                    <button type="button" class="tier-chip-edit" data-edit-variant="${variant.id}" title="Изменить">✎</button>
+                    <img ${imgTagAttrs(variant.image, 'image-preview')} alt="${escapeHtml(variant.name)}"
+                         title="Увеличить">
+                    <span>${escapeHtml(variant.name)}</span>
+                </div>`;
+        }
+
+        function renderTierListBoard() {
+            const board = document.getElementById('tierListBoard');
+            if (!board || !tierListState) return;
+
+            const unrankedChips = tierListState.unassigned.map(renderTierVariantChip).join('');
+            const tierRows = tierListState.tiers.map((tier, index) => {
+                const color = TIER_COLORS[index % TIER_COLORS.length];
+                const chips = tier.variantIds.map(renderTierVariantChip).join('');
+                return `
+                    <div class="tier-row" data-tier-id="${tier.id}" style="--tier-color: ${color}">
+                        <div class="tier-label-col">
+                            <input type="text" class="tier-label-input" value="${escapeHtml(tier.label)}"
+                                   maxlength="12" data-tier-id="${tier.id}" aria-label="Название тира">
+                            <button type="button" class="tier-remove" data-remove-tier="${tier.id}" title="Удалить тир">✕</button>
+                        </div>
+                        <div class="tier-dropzone select-target" data-drop="${tier.id}">${chips || ''}</div>
+                    </div>`;
+            }).join('');
+
+            board.innerHTML = `
+                <div class="tier-row tier-row-unranked">
+                    <div class="tier-label-col"><span>Без<br>тира</span></div>
+                    <div class="tier-dropzone select-target" data-drop="unassigned">${unrankedChips || ''}</div>
+                </div>
+                ${tierRows}`;
+
+            bindTierListBoardEvents(board);
+        }
+
+        function bindTierListBoardEvents(board) {
+            board.querySelectorAll('.tier-label-input').forEach(input => {
+                input.addEventListener('change', () => {
+                    const tier = tierListState.tiers.find(t => t.id === input.dataset.tierId);
+                    if (tier) {
+                        tier.label = input.value.trim() || tier.label;
+                        input.value = tier.label;
+                        saveTierListProgress();
+                    }
+                });
+            });
+
+            board.querySelectorAll('[data-remove-tier]').forEach(btn => {
+                btn.addEventListener('click', () => removeTierRow(btn.dataset.removeTier));
+            });
+
+            board.querySelectorAll('.tier-variant-chip').forEach(chip => {
+                chip.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/variant-id', chip.dataset.variantId);
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                chip.querySelectorAll('[data-edit-variant]').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        openEditVariantDuringTest(btn.dataset.editVariant);
+                    });
+                });
+                chip.addEventListener('click', e => {
+                    if (e.target.closest('.image-preview') || e.target.closest('.tier-chip-edit')) return;
+                    e.stopPropagation();
+                    const id = chip.dataset.variantId;
+                    tierListSelectedVariantId = tierListSelectedVariantId === id ? null : id;
+                    renderTierListBoard();
+                });
+                const chipImg = chip.querySelector('.image-preview');
+                if (chipImg) {
+                    chipImg.addEventListener('click', e => {
+                        e.stopPropagation();
+                        openImagePreview(chipImg.dataset.originalSrc || chipImg.src, chipImg.alt);
+                    });
+                }
+            });
+
+            board.querySelectorAll('.tier-dropzone').forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const variantId = e.dataTransfer.getData('text/variant-id');
+                    if (variantId) moveVariantToZone(variantId, zone.dataset.drop);
+                });
+                zone.addEventListener('click', () => {
+                    if (tierListSelectedVariantId) {
+                        moveVariantToZone(tierListSelectedVariantId, zone.dataset.drop);
+                    }
+                });
+            });
+        }
+
+        function startTierList(testId, options) {
+            const opts = options || {};
+            currentTest = tests.find(t => t.id === testId);
+            currentTestId = testId;
+            if (!currentTest) {
+                alert('Тест не найден');
+                return;
+            }
+            const draft = getTestProgress(testId).tierlist;
+            const prev = getResultSlot(testId).tierlist;
+
+            if (opts.resume && draft && draft.tierListState) {
+                tierListState = {
+                    tiers: draft.tierListState.tiers.map(t => ({
+                        id: t.id,
+                        label: t.label,
+                        variantIds: [...t.variantIds]
+                    })),
+                    unassigned: [...draft.tierListState.unassigned]
+                };
+                compareSessionTitleSuffix = draft.titleSuffix || ' — черновик';
+            } else if (opts.reset) {
+                clearTierListProgress(testId);
+                if (prev && prev.tiers && prev.tiers.length) {
+                    tierListState = {
+                        tiers: prev.tiers.map(t => ({
+                            id: t.id,
+                            label: t.label,
+                            variantIds: []
+                        })),
+                        unassigned: currentTest.variants.map(v => v.id)
+                    };
+                } else {
+                    tierListState = createEmptyTierListState();
+                }
+                compareSessionTitleSuffix = ' — тир-лист';
+            } else if (draft && draft.tierListState && !opts.fresh) {
+                tierListState = {
+                    tiers: draft.tierListState.tiers.map(t => ({
+                        id: t.id,
+                        label: t.label,
+                        variantIds: [...t.variantIds]
+                    })),
+                    unassigned: [...draft.tierListState.unassigned]
+                };
+                compareSessionTitleSuffix = draft.titleSuffix || ' — черновик';
+            } else if (prev && prev.tiers && prev.tiers.length) {
+                tierListState = hydrateTierListFromSaved(prev, currentTest.variants);
+                compareSessionTitleSuffix = ' — продолжение';
+            } else {
+                tierListState = createEmptyTierListState();
+                compareSessionTitleSuffix = ' — тир-лист';
+            }
+
+            tierListSelectedVariantId = null;
+            document.getElementById('tierListTestName').textContent =
+                currentTest.name + compareSessionTitleSuffix;
+            renderTierListBoard();
+            saveTierListProgress();
+            showScreen('takeTierList');
+        }
+
+        function continueTierList(testId) {
+            const draft = getTestProgress(testId).tierlist;
+            if (draft && draft.tierListState) {
+                startTierList(testId, { resume: true });
+                return;
+            }
+            startTierList(testId, { reset: false, fresh: true });
+        }
+
+        function resumeTierListDraft(testId) {
+            startTierList(testId, { resume: true });
+        }
+
+        function addTierRow() {
+            if (!tierListState) return;
+            const n = tierListState.tiers.length + 1;
+            tierListState.tiers.push({
+                id: 'tier_' + Date.now(),
+                label: 'T' + n,
+                variantIds: []
+            });
+            renderTierListBoard();
+            saveTierListProgress();
+        }
+
+        function removeTierRow(tierId) {
+            if (!tierListState) return;
+            const tier = tierListState.tiers.find(t => t.id === tierId);
+            if (!tier) return;
+            if (tierListState.tiers.length <= 1) {
+                alert('Должен остаться хотя бы один тир');
+                return;
+            }
+            tierListState.unassigned.push(...tier.variantIds);
+            tierListState.tiers = tierListState.tiers.filter(t => t.id !== tierId);
+            renderTierListBoard();
+            saveTierListProgress();
+        }
+
+        function saveTierListResult() {
+            if (!tierListState || !currentTest) return;
+
+            const placedCount = currentTest.variants.length - tierListState.unassigned.length;
+            if (placedCount === 0) {
+                alert('Расставьте хотя бы один вариант по тирам');
+                return;
+            }
+            if (tierListState.unassigned.length > 0) {
+                showConfirmation('Часть вариантов осталась без тира. Всё равно сохранить?', finishTierListSave);
+                return;
+            }
+
+            finishTierListSave();
+        }
+
+        function finishTierListSave() {
+            const emptyLabels = tierListState.tiers.some(t => !t.label.trim());
+            if (emptyLabels) {
+                alert('У каждого тира должно быть название');
+                return;
+            }
+
+            persistTierListResult(currentTestId, {
+                testName: currentTest.name,
+                date: new Date().toISOString(),
+                variants: currentTest.variants,
+                tiers: tierListState.tiers.map(t => ({
+                    id: t.id,
+                    label: t.label.trim(),
+                    variantIds: [...t.variantIds]
+                })),
+                unassigned: [...tierListState.unassigned]
+            });
+
+            clearTierListProgress(currentTestId);
+            alert('Тир-лист сохранён!');
+            showResultsList();
+        }
+
+        function renderTierListResultHtml(result, readonly) {
+            const ro = readonly ? ' tierlist-readonly' : '';
+            const variantsMap = {};
+            (result.variants || []).forEach(v => { variantsMap[v.id] = v; });
+
+            function chips(ids) {
+                return ids.map(id => {
+                    const v = variantsMap[id];
+                    if (!v) return '';
+                    return `
+                        <div class="tier-variant-chip">
+                            <img ${imgTagAttrs(v.image, 'image-preview')} alt="${escapeHtml(v.name)}"
+                                 title="Увеличить"
+                                 onclick="event.stopPropagation(); openImagePreview(this.dataset.originalSrc || this.src, this.alt)">
+                            <span>${escapeHtml(v.name)}</span>
+                        </div>`;
+                }).join('');
+            }
+
+            const unassigned = result.unassigned || [];
+            const tiers = result.tiers || [];
+
+            const unrankedRow = `
+                <div class="tier-row tier-row-unranked${ro}">
+                    <div class="tier-label-col">
+                        <div class="tier-label-readonly">Без тира</div>
+                    </div>
+                    <div class="tier-dropzone">${chips(unassigned)}</div>
+                </div>`;
+
+            const tierRows = tiers.map((tier, index) => {
+                const color = TIER_COLORS[index % TIER_COLORS.length];
+                return `
+                    <div class="tier-row${ro}" style="--tier-color: ${color}">
+                        <div class="tier-label-col">
+                            <div class="tier-label-readonly">${escapeHtml(tier.label)}</div>
+                        </div>
+                        <div class="tier-dropzone">${chips(tier.variantIds || [])}</div>
+                    </div>`;
+            }).join('');
+
+            return `<div class="tierlist-board${ro}">${unrankedRow}${tierRows}</div>`;
+        }
+
+        function setProgress(current, total) {
+            const pct = total === 0 ? 0 : Math.round((current / total) * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+            const progressText = document.getElementById('progressText');
+            if (progressText) {
+                progressText.textContent = total ? `${current} / ${total} (${pct}%)` : '0%';
+            }
+        }
+
+        function placeBadgeClass(place) {
+            if (place === 1) return 'gold';
+            if (place === 2) return 'silver';
+            if (place === 3) return 'bronze';
+            return '';
+        }
+
+        function showMainMenu() {
+            showScreen('mainMenu');
+        }
+
+        function showCreateTest() {
+            showScreen('createTest');
+            initCreateTest();
+        }
+
+        function showTestsList() {
+            showScreen('testsList');
+            loadTestsList();
+        }
+
+        function showResultsList() {
+            showScreen('resultsList');
+            loadResultsList();
+        }
+
+        function showTestResult() {
+            showScreen('testResult');
+        }
+
+        function showAddVariants() {
+            showScreen('addVariants');
+            initAddVariants();
+        }
+
+        function showEditTest() {
+            showScreen('editTest');
+        }
+
+        // Создание теста
+        function initCreateTest() {
+            document.getElementById('testName').value = '';
+            document.getElementById('variantsList').innerHTML = '';
+            variantCounter = 0;
+            addVariant();
+            addVariant();
+        }
+
+        function addVariant(initialVariant = {}) {
+            variantCounter++;
+            const variantsList = document.getElementById('variantsList');
+            const variantDiv = document.createElement('div');
+            variantDiv.className = 'variant-item';
+            variantDiv.innerHTML = `
+                <div class="variant-fields">
+                    ${variantImageFieldHtml()}
+                    <div class="input-group">
+                        <input type="text" class="variant-name" placeholder="Имя">
+                    </div>
+                </div>
+                <button type="button" class="button danger icon-button variant-remove" onclick="removeVariant(this)" aria-label="Удалить вариант" title="Удалить вариант">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2m-8 0 1 14h8l1-14M10 10v6m4-6v6"/></svg>
+                </button>
+            `;
+            variantsList.appendChild(variantDiv);
+            setupVariantImageField(variantDiv);
+            variantDiv.querySelector('.variant-image-url').value = initialVariant.image || '';
+            variantDiv.querySelector('.variant-name').value = initialVariant.name || '';
+        }
+
+        function removeVariant(button) {
+            button.parentElement.remove();
+        }
+
+        function saveTest() {
+            const testName = document.getElementById('testName').value.trim();
+            if (!testName) {
+                alert('Введите название теста');
+                return;
+            }
+
+            const variantItems = document.querySelectorAll('.variant-item');
+            if (variantItems.length < 2) {
+                alert('Добавьте минимум 2 варианта');
+                return;
+            }
+
+            const variants = [];
+            let hasErrors = false;
+
+            variantItems.forEach((item, index) => {
+                const imageUrl = item.querySelector('.variant-image-url').value.trim();
+                const name = item.querySelector('.variant-name').value.trim();
+
+                if (!imageUrl && !name) {
+                    alert(`Заполните имя или изображение для варианта ${index + 1}`);
+                    hasErrors = true;
+                    return;
+                }
+
+                variants.push({
+                    id: 'var_' + Date.now() + '_' + index,
+                    image: imageUrl,
+                    name: name,
+                    description: ''
+                });
+            });
+
+            if (hasErrors) return;
+
+            if (variants.some(v => isBlockedHotlinkHost(v.image))) {
+                showConfirmation('Ссылки с Danbooru (cdn.donmai.us) в тесте не показываются. Откройте картинку в браузере, сохраните файл и нажмите «Загрузить файл», либо сохраните тест как есть.', () => finishSavingTest(testName, variants));
+                return;
+            }
+
+            finishSavingTest(testName, variants);
+        }
+
+        function finishSavingTest(testName, variants) {
+            const test = {
+                id: 'test_' + Date.now(),
+                name: testName,
+                variants: variants
+            };
+
+            tests.push(test);
+            saveTests();
+            alert('Тест создан успешно!');
+            showMainMenu();
+        }
+
+        // Загрузка списка тестов
+        function loadTestsList() {
+            const container = document.getElementById('testsContainer');
+            container.innerHTML = '';
+
+            if (tests.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Пока нет тестов. Создайте первый на главной.</p>
+                    </div>`;
+                return;
+            }
+
+            tests.forEach(test => {
+                const progress = getTestProgress(test.id);
+                const hasCompareDraft = !!(progress.compare && progress.compare.comparisonPairs);
+                const hasTierDraft = !!(progress.tierlist && progress.tierlist.tierListState);
+                const hasTierSave = !!getResultSlot(test.id).tierlist;
+                const tierBtnLabel = hasTierDraft ? 'Продолжить черновик' : (hasTierSave ? 'Тир-лист' : 'Тир-лист');
+                const testCard = document.createElement('div');
+                testCard.className = 'test-card';
+                const draftBadges = [
+                    hasCompareDraft ? '<span class="badge draft-badge">есть черновик сравнения</span>' : '',
+                    hasTierDraft ? '<span class="badge draft-badge">есть черновик тир-листа</span>' : ''
+                ].join('');
+                testCard.innerHTML = `
+                    <span class="badge">${test.variants.length} вариантов</span>
+                    ${draftBadges}
+                    <h3>${test.name}</h3>
+                    <p class="test-card-meta">Сравнение или тир-лист${hasTierSave ? ' · сохранённый тир-лист' : ''}</p>
+                    <div class="btn-row">
+                        ${hasCompareDraft
+                            ? `<button type="button" class="button primary" onclick="resumeCompareTest('${test.id}')">Продолжить сравнение</button>
+                               <button type="button" class="button" onclick="startTest('${test.id}', { fresh: true })">Сравнение сначала</button>`
+                            : `<button type="button" class="button primary" onclick="startTest('${test.id}')">Сравнение</button>`}
+                        ${hasTierDraft
+                            ? `<button type="button" class="button secondary" onclick="resumeTierListDraft('${test.id}')">Продолжить тир-лист</button>`
+                            : `<button type="button" class="button secondary" onclick="continueTierList('${test.id}')">${tierBtnLabel}</button>`}
+                        <button type="button" class="button" onclick="editTest('${test.id}')">Изменить</button>
+                        <button type="button" class="button danger" onclick="deleteTest('${test.id}')">Удалить</button>
+                    </div>
+                `;
+                container.appendChild(testCard);
+            });
+        }
+
+        function buildNewCompareSession(testId) {
+            currentTest = tests.find(t => t.id === testId);
+            currentTestId = testId;
+            compareSessionTitleSuffix = '';
+            currentComparisons = [];
+            for (let i = 0; i < currentTest.variants.length; i++) {
+                for (let j = i + 1; j < currentTest.variants.length; j++) {
+                    currentComparisons.push([
+                        currentTest.variants[i].id,
+                        currentTest.variants[j].id
+                    ]);
+                }
+            }
+            currentComparisons = shuffleArray(currentComparisons);
+            currentComparisonIndex = 0;
+            currentResults = {};
+            currentTest.variants.forEach(variant => {
+                currentResults[variant.id] = 0;
+            });
+            compareVoteHistory = [];
+        }
+
+        function loadCompareProgress(testId) {
+            const draft = getTestProgress(testId).compare;
+            if (!draft || !draft.comparisonPairs) return false;
+            currentTest = tests.find(t => t.id === testId);
+            currentTestId = testId;
+            if (!currentTest) return false;
+
+            const validIds = new Set(currentTest.variants.map(v => v.id));
+            currentComparisons = draft.comparisonPairs.filter(
+                pair => validIds.has(pair[0]) && validIds.has(pair[1])
+            );
+            currentComparisonIndex = Math.min(
+                draft.currentComparisonIndex || 0,
+                currentComparisons.length
+            );
+            currentResults = { ...draft.currentResults };
+            currentTest.variants.forEach(v => {
+                if (currentResults[v.id] == null) currentResults[v.id] = 0;
+            });
+            compareSessionTitleSuffix = draft.titleSuffix || '';
+            compareVoteHistory = Array.isArray(draft.voteHistory)
+                ? draft.voteHistory.map(entry => ({ ...entry }))
+                : [];
+            if (compareVoteHistory.length !== currentComparisonIndex) {
+                compareVoteHistory = [];
+            }
+            return currentComparisons.length > 0;
+        }
+
+        function resumeCompareTest(testId) {
+            if (!loadCompareProgress(testId)) {
+                alert('Черновик не найден или устарел');
+                return;
+            }
+            showScreen('takeTest');
+            document.getElementById('currentTestName').textContent =
+                currentTest.name + (compareSessionTitleSuffix || ' — продолжение');
+            showNextComparison();
+        }
+
+        // Запуск теста
+        function startTest(testId, options) {
+            const opts = options || {};
+            currentTest = tests.find(t => t.id === testId);
+            currentTestId = testId;
+
+            if (!currentTest) {
+                alert('Тест не найден');
+                return;
+            }
+
+            const hasDraft = !!(getTestProgress(testId).compare && getTestProgress(testId).compare.comparisonPairs);
+            if (!opts.fresh && hasDraft && !opts.resume) {
+                showConfirmation('Есть незавершённое сравнение. Продолжить?', () => resumeCompareTest(testId), 'Продолжить');
+                return;
+            }
+
+            if (opts.resume) {
+                resumeCompareTest(testId);
+                return;
+            }
+
+            clearCompareProgress(testId);
+            buildNewCompareSession(testId);
+
+            showScreen('takeTest');
+            document.getElementById('currentTestName').textContent =
+                currentTest.name + (compareSessionTitleSuffix || '');
+            saveCompareProgress();
+            showNextComparison();
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function showNextComparison() {
+            if (currentComparisonIndex >= currentComparisons.length) {
+                finishTest();
+                return;
+            }
+
+            setProgress(currentComparisonIndex, currentComparisons.length);
+
+            const [variant1, variant2] = getComparisonPairAt(currentComparisonIndex);
+            if (!variant1 || !variant2) {
+                alert('Не найдены варианты для сравнения. Начните тест заново.');
+                clearCompareProgress(currentTestId);
+                showTestsList();
+                return;
+            }
+            const container = document.getElementById('comparisonContainer');
+            
+            container.innerHTML = `
+                <div class="comparison-container">
+                    <div class="comparison-item" onclick="selectVariant('${variant1.id}')" role="button" tabindex="0">
+                        <img ${imgTagAttrs(variant1.image)} alt="${escapeHtml(variant1.name)}">
+                        <div class="comparison-item-footer">
+                            <h3>${escapeHtml(variant1.name)}</h3>
+                            ${variant1.description ? `<p>${escapeHtml(variant1.description)}</p>` : ''}
+                            <button type="button" class="button ghost comparison-edit-btn" onclick="event.stopPropagation(); openEditVariantDuringTest('${variant1.id}')">Изменить</button>
+                            <p class="comparison-hint">Нажмите карточку, чтобы выбрать</p>
+                        </div>
+                    </div>
+                    <div class="comparison-vs" aria-hidden="true">VS</div>
+                    <div class="comparison-item" onclick="selectVariant('${variant2.id}')" role="button" tabindex="0">
+                        <img ${imgTagAttrs(variant2.image)} alt="${escapeHtml(variant2.name)}">
+                        <div class="comparison-item-footer">
+                            <h3>${escapeHtml(variant2.name)}</h3>
+                            ${variant2.description ? `<p>${escapeHtml(variant2.description)}</p>` : ''}
+                            <button type="button" class="button ghost comparison-edit-btn" onclick="event.stopPropagation(); openEditVariantDuringTest('${variant2.id}')">Изменить</button>
+                            <p class="comparison-hint">Нажмите карточку, чтобы выбрать</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-controls">
+                    <div class="btn-row" style="justify-content: center; margin-bottom: 10px;">
+                        <button type="button" class="button secondary" onclick="stepCompareBack()"
+                            ${compareVoteHistory.length === 0 ? 'disabled' : ''}>← Шаг назад</button>
+                        <button type="button" class="button" onclick="selectBoth()">Не могу выбрать — ничья</button>
+                    </div>
+                    <p class="comparison-step">Сравнение ${currentComparisonIndex + 1} из ${currentComparisons.length}</p>
+                </div>
+            `;
+        }
+
+        function undoCompareVote(entry) {
+            if (!entry) return;
+            if (entry.type === 'pick') {
+                currentResults[entry.variantId] = (currentResults[entry.variantId] || 0) - 1;
+            } else if (entry.type === 'tie') {
+                currentResults[entry.ids[0]] = (currentResults[entry.ids[0]] || 0) - 0.5;
+                currentResults[entry.ids[1]] = (currentResults[entry.ids[1]] || 0) - 0.5;
+            }
+        }
+
+        function stepCompareBack() {
+            if (compareVoteHistory.length === 0 || currentComparisonIndex <= 0) {
+                return;
+            }
+            const lastVote = compareVoteHistory.pop();
+            currentComparisonIndex--;
+            undoCompareVote(lastVote);
+            saveCompareProgress();
+            showNextComparison();
+        }
+
+        function selectVariant(variantId) {
+            compareVoteHistory.push({ type: 'pick', variantId });
+            currentResults[variantId] = (currentResults[variantId] || 0) + 1;
+            currentComparisonIndex++;
+            saveCompareProgress();
+            showNextComparison();
+        }
+
+        function selectBoth() {
+            const [variant1, variant2] = getComparisonPairAt(currentComparisonIndex);
+            if (!variant1 || !variant2) return;
+            compareVoteHistory.push({ type: 'tie', ids: [variant1.id, variant2.id] });
+            currentResults[variant1.id] = (currentResults[variant1.id] || 0) + 0.5;
+            currentResults[variant2.id] = (currentResults[variant2.id] || 0) + 0.5;
+            currentComparisonIndex++;
+            saveCompareProgress();
+            showNextComparison();
+        }
+
+        function finishTest() {
+            setProgress(currentComparisons.length, currentComparisons.length);
+
+            persistCompareResult(currentTestId, {
+                testName: currentTest.name,
+                results: currentResults,
+                date: new Date().toISOString(),
+                variants: currentTest.variants
+            });
+
+            clearCompareProgress(currentTestId);
+            alert('Тест завершен! Результаты сохранены.');
+            showResultsList();
+        }
+
+        // Загрузка результатов
+        function loadResultsList() {
+            const container = document.getElementById('resultsContainer');
+            const entries = listResultEntries();
+
+            container.innerHTML = '';
+
+            if (entries.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>Результатов пока нет — сначала пройдите любой тест.</p>
+                    </div>`;
+                return;
+            }
+
+            entries.forEach(({ testId, mode, result }) => {
+                const resultCard = document.createElement('div');
+                resultCard.className = 'test-card';
+                const date = new Date(result.date).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                const isTier = mode === 'tierlist';
+                const modeClass = isTier ? 'mode-badge tier' : 'mode-badge';
+                const modeLabel = isTier ? 'Тир-лист' : 'Сравнение';
+                const openLabel = isTier ? 'Просмотр' : 'Открыть таблицу';
+                const passBtn = isTier
+                    ? `<button type="button" class="button primary" onclick="continueTierList('${testId}')">Пройти</button>`
+                    : '';
+                const viewBtnClass = isTier ? 'button secondary' : 'button primary';
+                resultCard.innerHTML = `
+                    <span class="badge ${modeClass}">${modeLabel}</span>
+                    <span class="badge">${result.variants.length} вариантов</span>
+                    <h3>${result.testName}</h3>
+                    <p class="test-card-meta">Сохранено ${date}</p>
+                    <div class="btn-row">
+                        ${passBtn}
+                        <button type="button" class="${viewBtnClass}" onclick="viewTestResult('${testId}', '${mode}')">${openLabel}</button>
+                    </div>
+                `;
+                container.appendChild(resultCard);
+            });
+        }
+
+        function viewTestResult(testId, mode) {
+            const slot = getResultSlot(testId);
+            const result = mode === 'tierlist' ? slot.tierlist : slot.compare;
+
+            if (!result) {
+                alert('Результат не найден');
+                return;
+            }
+
+            currentTestId = testId;
+            currentTest = tests.find(t => t.id === testId) || { variants: result.variants };
+            currentResultMode = mode === 'tierlist' ? 'tierlist' : 'compare';
+
+            document.getElementById('resultTestName').textContent = result.testName;
+
+            const actions = document.getElementById('resultActions');
+            if (currentResultMode === 'tierlist') {
+                actions.innerHTML = `
+                    <button type="button" class="button primary" onclick="retakeTierList()">Пройти / изменить</button>
+                    <button type="button" class="button" onclick="resetAndStartTierList()">Сбросить расстановку</button>
+                    <button type="button" class="button secondary" onclick="showAddVariants()">Добавить варианты</button>`;
+                document.getElementById('resultTable').innerHTML = renderTierListResultHtml(result, true);
+                showScreen('testResult');
+                return;
+            }
+
+            actions.innerHTML = `
+                <button type="button" class="button primary" onclick="retakeTest()">Пройти сравнение заново</button>
+                <button type="button" class="button secondary" onclick="showAddVariants()">Добавить варианты</button>`;
+
+            // Создаем таблицу результатов
+            const sortedResults = Object.entries(result.results || {})
+                .map(([variantId, score]) => {
+                    const variant = result.variants.find(v => v.id === variantId);
+                    return { variant, score };
+                })
+                .sort((a, b) => b.score - a.score);
+
+            // Определяем места с учетом равных результатов
+            let currentPlace = 1;
+            let sameScoreCount = 0;
+            
+            const resultsWithPlaces = sortedResults.map((item, index) => {
+                if (index > 0 && item.score !== sortedResults[index - 1].score) {
+                    currentPlace += sameScoreCount + 1;
+                    sameScoreCount = 0;
+                } else if (index > 0 && item.score === sortedResults[index - 1].score) {
+                    sameScoreCount++;
+                }
+                
+                return { ...item, place: currentPlace };
+            });
+
+            const tableHtml = `
+                <div class="table-wrap">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Место</th>
+                                <th></th>
+                                <th>Название</th>
+                                <th>Описание</th>
+                                <th>Очки</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${resultsWithPlaces.map(item => {
+                                const v = item.variant;
+                                if (!v) return '';
+                                const pb = placeBadgeClass(item.place);
+                                return `
+                                <tr>
+                                    <td><span class="place-badge ${pb}">${item.place}</span></td>
+                                    <td><img ${imgTagAttrs(v.image, 'image-preview')} alt="${v.name}" title="Увеличить"
+                                             onclick="openImagePreview(this.dataset.originalSrc || this.src, this.alt)"></td>
+                                    <td><strong>${v.name}</strong></td>
+                                    <td>${v.description || '—'}</td>
+                                    <td class="score-cell">${item.score}</td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('resultTable').innerHTML = tableHtml;
+            showScreen('testResult');
+        }
+
+        function retakeTest() {
+            startTest(currentTestId, { fresh: true });
+        }
+
+        function retakeTierList() {
+            continueTierList(currentTestId);
+        }
+
+        function resetAndStartTierList() {
+            startTierList(currentTestId, { reset: true });
+        }
+
+        // Добавление новых вариантов
+        function initAddVariants() {
+            document.getElementById('newVariantsList').innerHTML = '';
+            newVariantCounter = 0;
+            addNewVariant();
+        }
+
+        function addNewVariant(initialVariant = {}) {
+            newVariantCounter++;
+            const variantsList = document.getElementById('newVariantsList');
+            const variantDiv = document.createElement('div');
+            variantDiv.className = 'variant-item';
+            variantDiv.innerHTML = `
+                <div class="variant-fields">
+                    ${variantImageFieldHtml()}
+                    <div class="input-group">
+                        <input type="text" class="new-variant-name" placeholder="Имя">
+                    </div>
+                </div>
+                <button type="button" class="button danger icon-button variant-remove" onclick="removeNewVariant(this)" aria-label="Удалить вариант" title="Удалить вариант">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2m-8 0 1 14h8l1-14M10 10v6m4-6v6"/></svg>
+                </button>
+            `;
+            variantsList.appendChild(variantDiv);
+            setupVariantImageField(variantDiv);
+            variantDiv.querySelector('.variant-image-url').value = initialVariant.image || '';
+            variantDiv.querySelector('.new-variant-name').value = initialVariant.name || '';
+        }
+
+        function removeNewVariant(button) {
+            button.parentElement.remove();
+        }
+
+        function saveNewVariants() {
+            const variantItems = document.querySelectorAll('#newVariantsList .variant-item');
+            
+            if (variantItems.length === 0) {
+                alert('Добавьте минимум 1 новый вариант');
+                return;
+            }
+
+            const newVariants = [];
+            let hasErrors = false;
+
+            variantItems.forEach((item, index) => {
+                const imageUrl = item.querySelector('.variant-image-url').value.trim();
+                const name = item.querySelector('.new-variant-name').value.trim();
+
+                if (!imageUrl && !name) {
+                    alert(`Заполните имя или изображение для варианта ${index + 1}`);
+                    hasErrors = true;
+                    return;
+                }
+
+                newVariants.push({
+                    id: 'var_' + Date.now() + '_' + index,
+                    image: imageUrl,
+                    name: name,
+                    description: ''
+                });
+            });
+
+            if (hasErrors) return;
+
+            // Добавляем новые варианты к тесту
+            const testIndex = tests.findIndex(t => t.id === currentTestId);
+            tests[testIndex].variants.push(...newVariants);
+            saveTests();
+
+            // Запускаем тест только для новых вариантов против существующих
+            startTestForNewVariants(newVariants);
+        }
+
+        function startTestForNewVariants(newVariants) {
+            currentTest = tests.find(t => t.id === currentTestId);
+            const newVariantIds = new Set(newVariants.map(v => v.id));
+            const allVariants = currentTest.variants;
+
+            // Все пары «каждый с каждым», где участвует хотя бы один новый вариант
+            // (пары только из старых уже были в полном прохождении)
+            currentComparisons = [];
+            for (let i = 0; i < allVariants.length; i++) {
+                for (let j = i + 1; j < allVariants.length; j++) {
+                    const a = allVariants[i];
+                    const b = allVariants[j];
+                    if (newVariantIds.has(a.id) || newVariantIds.has(b.id)) {
+                        currentComparisons.push([a.id, b.id]);
+                    }
+                }
+            }
+
+            currentComparisons = shuffleArray(currentComparisons);
+            currentComparisonIndex = 0;
+
+            const compareResult = getResultSlot(currentTestId).compare;
+            currentResults = compareResult ? { ...compareResult.results } : {};
+
+            newVariants.forEach(variant => {
+                currentResults[variant.id] = 0;
+            });
+
+            if (currentComparisons.length === 0) {
+                alert('Нет вариантов для сравнения');
+                return;
+            }
+
+            compareSessionTitleSuffix = ' (новые варианты)';
+            compareVoteHistory = [];
+            clearCompareProgress(currentTestId);
+            showScreen('takeTest');
+            document.getElementById('currentTestName').textContent = currentTest.name + compareSessionTitleSuffix;
+            saveCompareProgress();
+            showNextComparison();
+        }
+
+        // Редактирование и удаление тестов
+        let editingTestId = null;
+        let editVariantCounter = 0;
+
+        function editTest(testId) {
+            const test = tests.find(t => t.id === testId);
+            if (!test) {
+                alert('Тест не найден');
+                return;
+            }
+
+            editingTestId = testId;
+            document.getElementById('editTestName').value = test.name;
+            
+            const variantsList = document.getElementById('editVariantsList');
+            variantsList.innerHTML = '';
+            editVariantCounter = 0;
+
+            test.variants.forEach(variant => {
+                addEditVariant(variant);
+            });
+
+            showScreen('editTest');
+        }
+
+        function addEditVariant(existingVariant = null) {
+            editVariantCounter++;
+            const variantsList = document.getElementById('editVariantsList');
+            const variantDiv = document.createElement('div');
+            variantDiv.className = 'variant-item';
+            
+            const imageUrl = existingVariant ? existingVariant.image : '';
+            const name = existingVariant ? existingVariant.name : '';
+            const variantId = existingVariant ? existingVariant.id : '';
+
+            variantDiv.innerHTML = `
+                <input type="hidden" class="variant-id" value="${variantId}">
+                <div class="variant-fields">
+                    ${variantImageFieldHtml()}
+                    <div class="input-group">
+                        <input type="text" class="variant-name" placeholder="Имя" value="${escapeHtml(name)}">
+                    </div>
+                </div>
+                <button type="button" class="button danger icon-button variant-remove" onclick="removeEditVariant(this)" aria-label="Удалить вариант" title="Удалить вариант">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2m-8 0 1 14h8l1-14M10 10v6m4-6v6"/></svg>
+                </button>
+            `;
+            variantsList.appendChild(variantDiv);
+            setupVariantImageField(variantDiv);
+            if (imageUrl) {
+                variantDiv.querySelector('.variant-image-url').value = imageUrl;
+            }
+        }
+
+        function removeEditVariant(button) {
+            button.parentElement.remove();
+        }
+
+        function saveEditedTest() {
+            const testName = document.getElementById('editTestName').value.trim();
+            if (!testName) {
+                alert('Введите название теста');
+                return;
+            }
+
+            const variantItems = document.querySelectorAll('#editVariantsList .variant-item');
+            if (variantItems.length < 2) {
+                alert('Добавьте минимум 2 варианта');
+                return;
+            }
+
+            const variants = [];
+            let hasErrors = false;
+
+            variantItems.forEach((item, index) => {
+                const imageUrl = item.querySelector('.variant-image-url').value.trim();
+                const name = item.querySelector('.variant-name').value.trim();
+                const variantId = item.querySelector('.variant-id').value;
+
+                if (!imageUrl && !name) {
+                    alert(`Заполните имя или изображение для варианта ${index + 1}`);
+                    hasErrors = true;
+                    return;
+                }
+
+                variants.push({
+                    id: variantId || 'var_' + Date.now() + '_' + index,
+                    image: imageUrl,
+                    name: name,
+                    description: ''
+                });
+            });
+
+            if (hasErrors) return;
+
+            // Обновляем тест
+            const testIndex = tests.findIndex(t => t.id === editingTestId);
+            tests[testIndex].name = testName;
+            tests[testIndex].variants = variants;
+            
+            saveTests();
+            alert('Тест обновлен успешно!');
+            showTestsList();
+        }
+
+        function cancelEdit() {
+            showTestsList();
+        }
+
+        function deleteTest(testId) {
+            const test = tests.find(t => t.id === testId);
+            if (!test) {
+                alert('Тест не найден');
+                return;
+            }
+
+            showConfirmation(`Вы действительно хотите удалить тест "${test.name}"? Это действие нельзя отменить.`, () => {
+                // Удаляем тест
+                tests = tests.filter(t => t.id !== testId);
+                saveTests();
+
+                const store = getResultsStore();
+                delete store[testId];
+                setResultsStore(store);
+
+                clearAllProgress(testId);
+
+                alert('Тест удален успешно!');
+                loadTestsList();
+            }, 'Удалить', 'danger');
+        }
+
+        // Утилиты
+        function saveTests() {
+            localStorage.setItem('tests', JSON.stringify(tests));
+        }
+
+        // Модальные окна
+        // Переопределяем стандартные browser alert-вызовы единым стилизованным окном.
+        function alert(message) {
+            showNotice(message);
+        }
+
+        function showNotice(message) {
+            showModal(`
+                <h3 style="margin:0 0 12px;color:#fff;">Сообщение</h3>
+                <p style="margin:0;color:var(--text-muted);line-height:1.5;">${escapeHtml(message)}</p>
+                <div class="btn-row" style="justify-content:flex-end;margin-top:22px;">
+                    <button type="button" class="button primary" onclick="closeModal()">Понятно</button>
+                </div>
+            `);
+        }
+
+        function showConfirmation(message, onConfirm, confirmLabel = 'Продолжить', confirmStyle = 'primary') {
+            modalConfirmAction = onConfirm;
+            showModal(`
+                <h3 style="margin:0 0 12px;color:#fff;">Подтверждение</h3>
+                <p style="margin:0;color:var(--text-muted);line-height:1.5;">${escapeHtml(message)}</p>
+                <div class="btn-row" style="justify-content:flex-end;margin-top:22px;">
+                    <button type="button" class="button" onclick="closeModal()">Отмена</button>
+                    <button type="button" class="button ${confirmStyle}" onclick="confirmModalAction()">${escapeHtml(confirmLabel)}</button>
+                </div>
+            `);
+        }
+
+        function confirmModalAction() {
+            const action = modalConfirmAction;
+            closeModal();
+            if (action) action();
+        }
+
+        function showModal(content) {
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            modalConfirmAction = null;
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Закрытие модального окна по клику вне его
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
